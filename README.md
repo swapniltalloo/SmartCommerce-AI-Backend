@@ -135,7 +135,7 @@ mvn spring-boot:run
 
 ---
 
-##Swagger output
+Swagger output
 <img width="1901" height="891" alt="image" src="https://github.com/user-attachments/assets/709180ab-92e7-4a69-9a88-cce310f71927" />
 
 ##  Author
