@@ -1,145 +1,296 @@
-# SmartCommerce AI Backend 
-A professional Spring Boot backend project built using Java, Spring Boot, PostgreSQL, JPA/Hibernate, Validation, Swagger, and REST APIs.
+# SmartCommerce AI Backend
 
-This project demonstrates industry-level backend development concepts including CRUD operations, DTO validation, exception handling, API documentation, and database integration.
+A production-style E-Commerce Backend built using Spring Boot, PostgreSQL, Spring Security, JWT Authentication, Hibernate/JPA, and Swagger.
 
----
+This project demonstrates modern backend development practices including authentication, authorization, DTO architecture, database relationships, validation, exception handling, and shopping cart architecture.
 
-##  Features
+## Features
 
- Create Product API
- Get All Products API
- Get Product By ID API
- Update Product API
- Delete Product API
- PostgreSQL Database Integration
- DTO-based Request Handling
- Validation using Jakarta Validation
- Global Exception Handling
- Swagger/OpenAPI Documentation
- Layered Architecture (Controller-Service-Repository)
- Spring Data JPA & Hibernate
+### Authentication and Authorization
 
----
+- User Registration
+- User Login
+- JWT Authentication
+- BCrypt Password Encryption
+- Role-Based Access Control (RBAC)
+- ADMIN and USER Roles
+- Protected APIs using Spring Security
 
-##  Tech Stack
+### Product Management
 
-* Java 17
-* Spring Boot
-* Spring Data JPA
-* PostgreSQL
-* Maven
-* Swagger/OpenAPI
-* Hibernate
-* IntelliJ IDEA
-* Postman
+- Create Product
+- Get All Products
+- Get Product By ID
+- Update Product
+- Delete Product
+- Input Validation using Jakarta Validation
 
----
+### Category Management
+
+- Create Category
+- Get All Categories
+- Get Category By ID
+- Delete Category
+
+### Product-Category Relationship
+
+Implemented using JPA/Hibernate:
+
+```java
+@ManyToOne
+@JoinColumn(name = "category_id")
+private Category category;
+```
+
+```java
+@OneToMany(mappedBy = "category")
+@JsonIgnore
+private List<Product> products;
+```
+
+### DTO Architecture
+
+Implemented DTO-based API design:
+
+- LoginRequest
+- RegisterRequest
+- AuthResponse
+- ProductDTO
+- AddToCartRequest
+
+Benefits:
+
+- Clean API Design
+- Better Security
+- Validation Support
+- Separation of Concerns
+
+### Exception Handling
+
+Custom Exception Handling:
+
+- ResourceNotFoundException
+- Global Exception Handling
+- Validation Error Responses
+
+### Swagger Documentation
+
+Integrated Swagger OpenAPI.
+
+Features:
+
+- Interactive API Documentation
+- JWT Authentication Support
+- API Testing Interface
+
+Access:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+### Shopping Cart Architecture
+
+Implemented database architecture for shopping cart functionality.
+
+Cart:
+
+```java
+@OneToOne
+@JoinColumn(name = "user_id")
+private User user;
+```
+
+CartItem:
+
+```java
+@ManyToOne
+@JoinColumn(name = "product_id")
+private Product product;
+```
+
+```java
+@ManyToOne
+@JoinColumn(name = "cart_id")
+private Cart cart;
+```
+
+Current Structure:
+
+```text
+User
+ |
+ Cart
+ |
+ CartItem
+ |      |
+ Product Quantity
+```
+
+## Project Architecture
+
+```text
+Controller
+    |
+Service
+    |
+Repository
+    |
+PostgreSQL
+```
+
+## Tech Stack
+
+Backend
+
+- Java 21
+- Spring Boot 3
+- Spring Security
+- Spring Data JPA
+- Hibernate
+
+Database
+
+- PostgreSQL
+
+Authentication
+
+- JWT
+- BCrypt
+
+Documentation
+
+- Swagger OpenAPI
+
+Build Tool
+
+- Maven
 
 ## Project Structure
 
+```text
 src/main/java/com/swapnil/smartcommerce
 
-├── controller
+config
+├── SecurityConfig
+└── SwaggerConfig
 
-├── service
+controller
+├── AuthController
+├── ProductController
+└── CategoryController
 
-├── repository
+dto
+├── LoginRequest
+├── RegisterRequest
+├── AuthResponse
+├── ProductDTO
+└── AddToCartRequest
 
-├── entity
+entity
+├── User
+├── Product
+├── Category
+├── Cart
+└── CartItem
 
-├── dto
+repository
+├── UserRepository
+├── ProductRepository
+├── CategoryRepository
+├── CartRepository
+└── CartItemRepository
 
-├── exception
+security
+├── JwtService
+└── JwtAuthFilter
 
-├── config
+service
+├── AuthService
+├── ProductService
+├── CategoryService
+└── CartService
 
----
+exception
+```
 
-##  API Endpoints
+## Database Relationships
 
-### Product APIs
+User and Cart
 
-| Method | Endpoint           | Description       |
-| ------ | ------------------ | ----------------- |
-| POST   | /api/products      | Create Product    |
-| GET    | /api/products      | Get All Products  |
-| GET    | /api/products/{id} | Get Product By ID |
-| PUT    | /api/products/{id} | Update Product    |
-| DELETE | /api/products/{id} | Delete Product    |
+```text
+One User -> One Cart
+```
 
----
+Cart and CartItem
 
-## Swagger Documentation
+```text
+One Cart -> Many CartItems
+```
 
-After running the project:
+Product and Category
 
-http://localhost:8080/swagger-ui/index.html
+```text
+Many Products -> One Category
+```
 
----
+CartItem and Product
 
-##  Database Configuration
+```text
+Many CartItems -> One Product
+```
 
-PostgreSQL is used as the database.
+## API Security
 
-Example application.properties:
+| Endpoint | Access |
+|-----------|---------|
+| Register | Public |
+| Login | Public |
+| Get Products | USER / ADMIN |
+| Create Product | ADMIN |
+| Update Product | ADMIN |
+| Delete Product | ADMIN |
+| Create Category | ADMIN |
+| Delete Category | ADMIN |
 
-spring.datasource.url=jdbc:postgresql://localhost:5432/smartcommerce
+## Upcoming Features
 
-spring.datasource.username=postgres
+- Add To Cart API
+- View Cart API
+- Remove From Cart API
+- Order Management
+- Order Items
+- Inventory Management
+- Pagination and Sorting
+- Search APIs
+- Docker Support
+- Deployment
+- Unit Testing
+- Integration Testing
 
-spring.datasource.password=your_password
+## Learning Outcomes
 
-spring.jpa.hibernate.ddl-auto=update
+This project demonstrates:
 
-spring.jpa.show-sql=true
+- REST API Development
+- Spring Security
+- JWT Authentication
+- Role-Based Authorization
+- Hibernate/JPA Relationships
+- DTO Architecture
+- Exception Handling
+- Swagger Documentation
+- PostgreSQL Integration
+- Enterprise Backend Design Patterns
 
----
+  Swagger output
+<img width="1117" height="827" alt="image" src="https://github.com/user-attachments/assets/07b3a02f-227a-4d53-8a3c-9f4eaeaafc88" />
 
-## Running the Project
 
-### Clone Repository
-
-git clone https://github.com/swapniltalloo/SmartCommerce-AI-Backend.git
-
-### Navigate to Project
-
-cd SmartCommerce-AI-Backend
-
-### Run Application
-
-mvn spring-boot:run
-
----
-
-##  Sample Request JSON
-
-{
-"name": "Samsung S25",
-"description": "Graphite",
-"price": 33000,
-"quantity": 2
-}
-
----
-
-## Future Enhancements
-
-* JWT Authentication
-* Role-Based Authorization
-* Redis Caching
-* Docker Deployment
-* AI Product Search
-* Payment Integration
-* Cloud Deployment
-
----
-
-Swagger output
-<img width="1901" height="891" alt="image" src="https://github.com/user-attachments/assets/709180ab-92e7-4a69-9a88-cce310f71927" />
-
-##  Author
+## Author
 
 Swapnil Talloo
 
-GitHub: https://github.com/swapniltalloo
+B.Tech Electronics and Computer Science
+
+Passionate about Backend Development, Spring Boot, AI/ML, System Design and Software Engineering.
