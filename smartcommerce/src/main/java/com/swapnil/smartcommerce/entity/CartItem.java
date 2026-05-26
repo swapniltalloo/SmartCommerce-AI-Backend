@@ -4,31 +4,24 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "products")
+@Table(name = "cart_items")
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
-public class Product {
-
+public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Setter
-    @Getter
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
-
-    private String name;
-
-    private String description;
-
-    private Double price;
 
     private Integer quantity;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
 }

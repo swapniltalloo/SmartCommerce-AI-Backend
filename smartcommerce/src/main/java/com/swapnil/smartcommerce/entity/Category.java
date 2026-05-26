@@ -2,33 +2,26 @@ package com.swapnil.smartcommerce.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.List;
 
 @Entity
-@Table(name = "products")
+@Table(name = "categories")
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
-public class Product {
-
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Setter
-    @Getter
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
 
     private String name;
 
-    private String description;
-
-    private Double price;
-
-    private Integer quantity;
+    @OneToMany(mappedBy = "category")
+    @JsonIgnore
+    private List<Product> products;
 }

@@ -18,6 +18,8 @@ public class ProductDTO {
     @Min(value = 0, message = "Quantity cannot be negative")
     private int quantity;
 
+    private Long categoryId;
+
     public String getName() {
         return name;
     }
@@ -48,5 +50,13 @@ public class ProductDTO {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 }

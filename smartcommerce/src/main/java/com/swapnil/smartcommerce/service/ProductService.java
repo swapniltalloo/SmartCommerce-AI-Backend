@@ -7,14 +7,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+import com.swapnil.smartcommerce.dto.ProductDTO;
+import com.swapnil.smartcommerce.entity.Category;
+import com.swapnil.smartcommerce.repository.CategoryRepository;
 @Service
 public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+    public Product addProduct(ProductDTO productDTO) {
 
-    public Product addProduct(Product product) {
+        Category category = categoryRepository.findById(
+                productDTO.getCategoryId()
+        ).orElseThrow(() ->
+                new ResourceNotFoundException(
+                        "Category not found with id: "
+                                + productDTO.getCategoryId()
+                )
+        );
+
+        Product product = new Product();
+
+        product.setName(productDTO.getName());
+        product.setDescription(productDTO.getDescription());
+        product.setPrice(productDTO.getPrice());
+        product.setQuantity(productDTO.getQuantity());
+
+        product.setCategory(category);
+
         return productRepository.save(product);
     }
 

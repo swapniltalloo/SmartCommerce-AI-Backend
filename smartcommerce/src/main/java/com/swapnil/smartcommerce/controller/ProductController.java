@@ -15,18 +15,13 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-        public Product addProduct(@Valid @RequestBody ProductDTO productDTO) {
+    public Product addProduct(
+            @Valid @RequestBody ProductDTO productDTO) {
 
-        Product product = new Product();
-
-        product.setName(productDTO.getName());
-        product.setDescription(productDTO.getDescription());
-        product.setPrice(productDTO.getPrice());
-        product.setQuantity(productDTO.getQuantity());
-
-        return productService.addProduct(product);
+        return productService.addProduct(productDTO);
     }
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping
