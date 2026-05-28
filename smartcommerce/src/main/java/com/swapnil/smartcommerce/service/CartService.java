@@ -1,5 +1,6 @@
 package com.swapnil.smartcommerce.service;
 
+import com.swapnil.smartcommerce.entity.Cart;
 import com.swapnil.smartcommerce.repository.CartItemRepository;
 import com.swapnil.smartcommerce.repository.CartRepository;
 import com.swapnil.smartcommerce.repository.ProductRepository;
@@ -28,16 +29,22 @@ public class CartService {
                 new RuntimeException("Product not found")
         );
 
+        Cart cart = cartRepository.findById(1L)
+                .orElseThrow(() ->
+                        new RuntimeException("Cart not found")
+                );
+
         CartItem cartItem = new CartItem();
 
         cartItem.setProduct(product);
+
+        cartItem.setCart(cart);
 
         cartItem.setQuantity(
                 request.getQuantity()
         );
 
-        return cartItem.getProduct().getName()
-                + " Qty: "
-                + cartItem.getQuantity();
-    }
-}
+        cartItemRepository.save(cartItem);
+
+        return "Product added to cart successfully";
+    }}
