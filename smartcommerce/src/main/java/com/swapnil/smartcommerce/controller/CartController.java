@@ -1,10 +1,13 @@
 package com.swapnil.smartcommerce.controller;
 
 import com.swapnil.smartcommerce.dto.AddToCartRequest;
+import com.swapnil.smartcommerce.entity.CartItem;
 import com.swapnil.smartcommerce.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import com.swapnil.smartcommerce.dto.CartResponseDTO;
+import com.swapnil.smartcommerce.entity.CartItem;
+import java.util.List;
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
@@ -17,5 +20,11 @@ public class CartController {
             @RequestBody AddToCartRequest request) {
 
         return cartService.addToCart(request);
+    }
+
+    @GetMapping
+    public List<CartResponseDTO> getCart() {
+
+        return cartService.getCart();
     }
 }
