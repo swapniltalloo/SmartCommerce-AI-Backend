@@ -1,6 +1,8 @@
 package com.swapnil.smartcommerce.controller;
 
 import com.swapnil.smartcommerce.dto.AddToCartRequest;
+import com.swapnil.smartcommerce.dto.CartSummaryDTO;
+import com.swapnil.smartcommerce.dto.UpdateCartRequest;
 import com.swapnil.smartcommerce.entity.CartItem;
 import com.swapnil.smartcommerce.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +25,25 @@ public class CartController {
     }
 
     @GetMapping
-    public List<CartResponseDTO> getCart() {
+    public CartSummaryDTO getCart() {
 
         return cartService.getCart();
+    }
+    @DeleteMapping("/remove/{productId}")
+    public String removeFromCart(
+            @PathVariable Long productId) {
+
+        return cartService.removeFromCart(productId);
+    }
+    @PutMapping("/update")
+    public String updateCartItem(
+            @RequestBody UpdateCartRequest request) {
+
+        return cartService.updateCartItem(request);
+    }
+    @DeleteMapping("/clear")
+    public String clearCart() {
+
+        return cartService.clearCart();
     }
 }

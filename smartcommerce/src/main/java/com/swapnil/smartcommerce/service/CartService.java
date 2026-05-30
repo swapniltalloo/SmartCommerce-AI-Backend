@@ -1,5 +1,6 @@
 package com.swapnil.smartcommerce.service;
 
+import com.swapnil.smartcommerce.dto.*;
 import com.swapnil.smartcommerce.entity.Cart;
 import com.swapnil.smartcommerce.repository.CartItemRepository;
 import com.swapnil.smartcommerce.repository.CartRepository;
@@ -8,7 +9,9 @@ import com.swapnil.smartcommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.swapnil.smartcommerce.dto.AddToCartRequest;
-import com.swapnil.smartcommerce.dto.AddToCartRequest;
+import java.util.List;
+import java.util.stream.Collectors;
+import com.swapnil.smartcommerce.dto.CartSummaryDTO;
 import com.swapnil.smartcommerce.dto.CartResponseDTO;
 import java.util.stream.Collectors;
 import com.swapnil.smartcommerce.entity.Product;
@@ -86,45 +89,194 @@ public class CartService {
         cartItemRepository.save(cartItem);
         return "Product added to cart successfully";
 
-    }public List<CartResponseDTO> getCart() {
+    }public CartSummaryDTO getCart() {
 
-            Authentication authentication =
-                    SecurityContextHolder.getContext()
-                            .getAuthentication();
+        Authentication authentication =
+                SecurityContextHolder.getContext()
+                        .getAuthentication();
 
-            String username =
-                    authentication.getName();
+        String username =
+                authentication.getName();
 
-            User user =
-                    userRepository.findByUsername(username)
-                            .orElseThrow(() ->
-                                    new RuntimeException(
-                                            "User not found"
-                                    )
-                            );
+        User user =
+                userRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"
+                                )
+                        );
 
-            Cart cart =
-                    cartRepository.findByUser(user)
-                            .orElseThrow(() ->
-                                    new RuntimeException(
-                                            "Cart not found"
-                                    )
-                            );
+        Cart cart =
+                cartRepository.findByUser(user)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Cart not found"
+                                )
+                        );
 
-        return cart.getCartItems()
-                .stream()
-                .map(cartItem -> CartResponseDTO.builder()
-                        .productName(
-                                cartItem.getProduct().getName()
+        List<CartResponseDTO> items =
+                cart.getCartItems()
+                        .stream()
+                        .map(cartItem -> CartResponseDTO.builder()
+                                .productName(
+                                        cartItem.getProduct().getName()
+                                )
+                                .price(
+                                        cartItem.getProduct().getPrice()
+                                )
+                                .quantity(
+                                        cartItem.getQuantity()
+                                )
+                                .build()
                         )
-                        .price(
+                        .collect(Collectors.toList());
+
+        Double totalAmount =
+                cart.getCartItems()
+                        .stream()
+                        .mapToDouble(cartItem ->
                                 cartItem.getProduct().getPrice()
+                                        * cartItem.getQuantity()
                         )
-                        .quantity(
-                                cartItem.getQuantity()
+                        .sum();
+
+        return CartSummaryDTO.builder()
+                .items(items)
+                .totalAmount(totalAmount)
+                .build();
+    }public String removeFromCart(Long productId) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext()
+                        .getAuthentication();
+
+        String username =
+                authentication.getName();
+
+        User user =
+                userRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"
+                                )
+                        );
+
+        Cart cart =
+                cartRepository.findByUser(user)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Cart not found"
+                                )
+                        );
+
+        Product product =
+                productRepository.findById(productId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Product not found"
+                                )
+                        );
+
+        CartItem cartItem =
+                cartItemRepository
+                        .findByCartAndProduct(cart, product)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Product not found in cart"
+                                )
+                        );
+
+        cartItemRepository.delete(cartItem);
+
+        return "Product removed from cart";
+    }
+    public String updateCartItem(
+            UpdateCartRequest request) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext()
+                        .getAuthentication();
+
+        String username =
+                authentication.getName();
+
+        User user =
+                userRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"
+                                )
+                        );
+
+        Cart cart =
+                cartRepository.findByUser(user)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Cart not found"
+                                )
+                        );
+
+        Product product =
+                productRepository.findById(
+                                request.getProductId()
                         )
-                        .build()
-                )
-                .collect(Collectors.toList());
-        }
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Product not found"
+                                )
+                        );
+
+        CartItem cartItem =
+                cartItemRepository
+                        .findByCartAndProduct(
+                                cart,
+                                product
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Product not found in cart"
+                                )
+                        );
+
+        cartItem.setQuantity(
+                request.getQuantity()
+        );
+
+        cartItemRepository.save(cartItem);
+
+        return "Cart item updated successfully";
+    }
+    public String clearCart() {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext()
+                        .getAuthentication();
+
+        String username =
+                authentication.getName();
+
+        User user =
+                userRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"
+                                )
+                        );
+
+        Cart cart =
+                cartRepository.findByUser(user)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Cart not found"
+                                )
+                        );
+
+        List<CartItem> cartItems =
+                cartItemRepository.findByCart(cart);
+
+        cartItemRepository.deleteAll(cartItems);
+
+        return "Cart cleared successfully";
+    }
+
     }
