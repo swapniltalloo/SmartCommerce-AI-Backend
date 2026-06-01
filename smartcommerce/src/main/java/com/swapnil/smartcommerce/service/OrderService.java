@@ -1,4 +1,5 @@
 package com.swapnil.smartcommerce.service;
+import com.swapnil.smartcommerce.dto.*;
 import com.swapnil.smartcommerce.entity.Order;
 import com.swapnil.smartcommerce.entity.Cart;
 import com.swapnil.smartcommerce.entity.CartItem;
@@ -6,7 +7,6 @@ import com.swapnil.smartcommerce.entity.User;
 import com.swapnil.smartcommerce.entity.OrderItem;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import com.swapnil.smartcommerce.dto.OrderResponseDTO;
 import com.swapnil.smartcommerce.entity.Order;
 import java.util.List;
 import java.util.List;
@@ -14,8 +14,7 @@ import com.swapnil.smartcommerce.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.swapnil.smartcommerce.repository.OrderRepository;
-import com.swapnil.smartcommerce.dto.OrderDetailsDTO;
-import com.swapnil.smartcommerce.dto.OrderItemDTO;
+
 @Service
 public class OrderService {
 
@@ -191,6 +190,144 @@ public class OrderService {
                         order.getTotalAmount()
                 )
                 .items(items)
+                .build();
+    }
+    public String cancelOrder(
+            Long orderId
+    ) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext()
+                        .getAuthentication();
+
+        String username =
+                authentication.getName();
+
+        User user =
+                userRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"
+                                )
+                        );
+
+        Order order =
+                orderRepository
+                        .findByIdAndUser(
+                                orderId,
+                                user
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Order not found"
+                                )
+                        );
+
+        order.setStatus("CANCELLED");
+
+        orderRepository.save(order);
+
+        return "Order cancelled successfully";
+    }
+    public String updateOrderStatus(
+            Long orderId,
+            UpdateOrderStatusRequest request
+    ) {
+
+        Order order =
+                orderRepository.findById(orderId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Order not found"
+                                )
+                        );
+
+        order.setStatus(
+                request.getStatus()
+        );
+
+        orderRepository.save(order);
+
+        return "Order status updated";
+    }
+    public List<OrderResponseDTO> getAllOrders() {
+
+        List<Order> orders =
+                orderRepository.findAll();
+
+        return orders.stream()
+                .map(order ->
+                        OrderResponseDTO.builder()
+                                .orderId(order.getId())
+                                .totalAmount(
+                                        order.getTotalAmount()
+                                )
+                                .status(
+                                        order.getStatus()
+                                )
+                                .build()
+                )
+                .toList();
+    }
+    public AdminRevenueDTO getRevenueStats() {
+
+        List<Order> orders =
+                orderRepository.findAll();
+
+        long totalOrders =
+                orders.size();
+
+        double totalRevenue =
+                orders.stream()
+                        .filter(order ->
+                                !"CANCELLED".equals(
+                                        order.getStatus()
+                                )
+                        )
+                        .mapToDouble(
+                                Order::getTotalAmount
+                        )
+                        .sum();
+
+        long cancelledOrders =
+                orders.stream()
+                        .filter(order ->
+                                "CANCELLED".equals(
+                                        order.getStatus()
+                                )
+                        )
+                        .count();
+
+        long placedOrders =
+                orders.stream()
+                        .filter(order ->
+                                "PLACED".equals(
+                                        order.getStatus()
+                                )
+                        )
+                        .count();
+
+        long shippedOrders =
+                orders.stream()
+                        .filter(order ->
+                                "SHIPPED".equals(
+                                        order.getStatus()
+                                )
+                        )
+                        .count();
+
+        return AdminRevenueDTO.builder()
+                .totalOrders(totalOrders)
+                .totalRevenue(totalRevenue)
+                .cancelledOrders(
+                        cancelledOrders
+                )
+                .placedOrders(
+                        placedOrders
+                )
+                .shippedOrders(
+                        shippedOrders
+                )
                 .build();
     }
 
