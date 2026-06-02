@@ -1,11 +1,11 @@
 package com.swapnil.smartcommerce.service;
-
+import org.springframework.cache.annotation.Cacheable;
 import com.swapnil.smartcommerce.entity.Product;
 import com.swapnil.smartcommerce.exception.ResourceNotFoundException;
 import com.swapnil.smartcommerce.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.cache.annotation.CacheEvict;
 import java.util.List;
 import com.swapnil.smartcommerce.dto.ProductDTO;
 import com.swapnil.smartcommerce.entity.Category;
@@ -17,6 +17,7 @@ public class ProductService {
     private ProductRepository productRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @CacheEvict(value = "products", allEntries = true)
     public Product addProduct(ProductDTO productDTO) {
 
         Category category = categoryRepository.findById(
@@ -39,7 +40,7 @@ public class ProductService {
 
         return productRepository.save(product);
     }
-
+    @Cacheable("products")
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
@@ -49,6 +50,7 @@ public class ProductService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product not found with id: " + id));
     }
+    @CacheEvict(value = "products", allEntries = true)
     public Product updateProduct(Long id, Product updatedProduct) {
 
         Product existingProduct = productRepository.findById(id).orElse(null);
@@ -64,7 +66,7 @@ public class ProductService {
         }
 
         return null;
-    }
+    }@CacheEvict(value = "products", allEntries = true)
     public String deleteProduct(Long id) {
 
         Product product = productRepository.findById(id)
