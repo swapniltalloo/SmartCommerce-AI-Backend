@@ -1,137 +1,239 @@
 # SmartCommerce AI Backend
 
-SmartCommerce AI Backend is a scalable e-commerce backend application built using Java, Spring Boot, Spring Security, PostgreSQL, Hibernate/JPA, and JWT Authentication. The project follows a layered architecture with DTO-based API design, role-based access control, shopping cart management, and category-based product organization.
+A production-style e-commerce backend application built using Java, Spring Boot, PostgreSQL, Redis, JWT Authentication, and Gemini AI integration. The project provides secure REST APIs for product management, cart operations, order processing, admin analytics, and AI-powered product assistance.
+
+---
 
 ## Features
 
 ### Authentication & Authorization
 
-- User Registration
-- User Login
-- JWT Token Generation
-- JWT Token Validation
-- BCrypt Password Encryption
-- Spring Security Integration
-- Role-Based Access Control (ADMIN, USER)
-- Swagger JWT Authorization Support
+* User Registration and Login
+* JWT-based Authentication
+* BCrypt Password Encryption
+* Role-Based Access Control (USER / ADMIN)
+* Spring Security Integration
 
 ### Product Management
 
-- Add Product
-- Get All Products
-- Get Product By ID
-- Update Product
-- Delete Product
-- Product Validation Using Jakarta Validation
-- Product DTO Implementation
+* Add Product (Admin)
+* Update Product (Admin)
+* Delete Product (Admin)
+* Get All Products
+* Get Product By ID
+* Category-wise Product Organization
 
 ### Category Management
 
-- Add Category
-- Get All Categories
-- Product-Category Mapping
-- One-to-Many Category Relationship
+* Create Category
+* View Categories
+* Product-Category Relationship Mapping
 
-### Shopping Cart Module
+### Cart Management
 
-- User-Specific Cart Management
-- Add Product To Cart
-- Prevent Duplicate Cart Items (UPSERT Logic)
-- View Cart
-- Update Cart Item Quantity
-- Remove Product From Cart
-- Clear Entire Cart
-- Cart Total Calculation
-- Cart Summary DTO Response
+* Add Products to Cart
+* Update Product Quantity
+* Remove Product from Cart
+* View Cart Items
+* Clear Cart
+* Cart Summary with Total Amount
 
-### Security Features
+### Order Management
 
-- JWT Authentication Filter
-- SecurityContextHolder Integration
-- User-Based Resource Access
-- Password Protection Using @JsonIgnore
-- Protected REST Endpoints
+* Place Order from Cart
+* View User Orders
+* View Order Details
+* Cancel Order
+* Order Status Tracking
+* Automatic Cart Cleanup After Order Placement
+
+### Admin Dashboard
+
+* Update Order Status
+* View Revenue Statistics
+* Monitor Order Metrics
+
+### Redis Caching
+
+* Redis Integration using Docker
+* Product API Response Caching
+* Cache Invalidation using @CacheEvict
+* Improved API Performance
+
+### AI Integration
+
+* Gemini API Integration
+* AI-powered Product Search & Recommendations
 
 ### API Documentation
 
-- Swagger UI Integration
-- Interactive API Testing
-- JWT Authorization Support Inside Swagger
+* Swagger/OpenAPI Integration
+* Interactive API Testing
 
-## Technologies Used
+---
 
-- Java 21
-- Spring Boot
-- Spring Security
-- Spring Data JPA
-- Hibernate
-- PostgreSQL
-- JWT
-- Lombok
-- Swagger/OpenAPI
-- Maven
+## Tech Stack
 
-## Project Structure
+### Backend
+
+* Java 17
+* Spring Boot 3
+* Spring Security
+* Spring Data JPA
+* Hibernate
+
+### Database
+
+* PostgreSQL
+
+### Caching
+
+* Redis
+
+### Authentication
+
+* JWT (JSON Web Tokens)
+
+### API Documentation
+
+* Swagger / OpenAPI
+
+### AI
+
+* Google Gemini API
+
+### DevOps
+
+* Docker
+* Git
+* GitHub
+
+---
+
+## Project Architecture
 
 ```text
-src/main/java/com/swapnil/smartcommerce
+Client
+   ↓
+Spring Security
+   ↓
+Controllers
+   ↓
+Services
+   ↓
+Repositories
+   ↓
+PostgreSQL
 
-├── config
-├── controller
-├── dto
-├── entity
-├── repository
-├── security
-├── service
-└── exception
+           ↓
+         Redis
+        (Cache)
+
+           ↓
+       Gemini AI
 ```
 
-## Database Design
+---
+
+## Database Entities
 
 ### User
 
-```text
-id
-username
-password
-role
-```
+* id
+* username
+* password
+* role
 
 ### Category
 
-```text
-id
-name
-```
+* id
+* name
 
 ### Product
 
-```text
-id
-name
-description
-price
-quantity
-category_id
-```
+* id
+* name
+* description
+* price
+* quantity
+* category
 
 ### Cart
 
-```text
-id
-user_id
-```
+* id
+* user
 
 ### CartItem
 
-```text
-id
-cart_id
-product_id
-quantity
+* id
+* quantity
+* cart
+* product
+
+### Order
+
+* id
+* totalAmount
+* status
+* user
+
+### OrderItem
+
+* id
+* quantity
+* price
+* order
+* product
+
+---
+
+## Security Features
+
+### User Role
+
+Can:
+
+* Browse Products
+* Manage Cart
+* Place Orders
+* View Orders
+* Cancel Orders
+
+### Admin Role
+
+Can:
+
+* Manage Products
+* Manage Categories
+* Update Order Status
+* Access Revenue Dashboard
+
+---
+
+## Redis Caching
+
+Implemented caching for frequently accessed product APIs.
+
+```java
+@Cacheable("products")
+public List<Product> getAllProducts()
 ```
 
-## Implemented APIs
+Cache invalidation:
+
+```java
+@CacheEvict(value = "products", allEntries = true)
+```
+
+Benefits:
+
+* Reduced Database Queries
+* Faster Response Time
+* Better Scalability
+
+---
+
+## API Endpoints
 
 ### Authentication
 
@@ -143,9 +245,9 @@ POST /auth/login
 ### Products
 
 ```http
-POST   /api/products
 GET    /api/products
 GET    /api/products/{id}
+POST   /api/products
 PUT    /api/products/{id}
 DELETE /api/products/{id}
 ```
@@ -163,120 +265,109 @@ GET  /api/categories
 POST   /api/cart/add
 GET    /api/cart
 PUT    /api/cart/update
-DELETE /api/cart/remove/{productId}
+DELETE /api/cart/remove/{id}
 DELETE /api/cart/clear
 ```
 
-## Example Cart Response
+### Orders
 
-```json
-{
-  "items": [
-    {
-      "productName": "MacBook Pro",
-      "price": 199999,
-      "quantity": 5
-    }
-  ],
-  "totalAmount": 999995
-}
+```http
+POST /api/orders
+GET  /api/orders
+GET  /api/orders/{id}
+PUT  /api/orders/{id}/cancel
+PUT  /api/orders/{id}/status
 ```
 
-## Architecture
+### Admin Analytics
 
-```text
-Controller
-    ↓
-Service
-    ↓
-Repository
-    ↓
-PostgreSQL
+```http
+GET /api/admin/revenue
 ```
 
-### Security Flow
+### AI APIs
 
-```text
-Client
-   ↓
-JWT Token
-   ↓
-JwtAuthFilter
-   ↓
-SecurityContextHolder
-   ↓
-Controller
-   ↓
-Service
+```http
+POST /api/gemini/ask
 ```
 
-### Cart Flow
+---
 
-```text
-User Login
-    ↓
-JWT Token
-    ↓
-Add Product To Cart
-    ↓
-CartItem Creation
-    ↓
-View Cart
-    ↓
-Calculate Total
+## Running the Project
+
+### Clone Repository
+
+```bash
+git clone https://github.com/swapniltalloo/SmartCommerce-AI-Backend.git
 ```
 
-## Key Concepts Implemented
+### Navigate
 
-- JWT Authentication
-- Role-Based Access Control
-- DTO Pattern
-- Builder Pattern
-- Entity Relationships
-- One-To-One Mapping
-- One-To-Many Mapping
-- Many-To-One Mapping
-- Spring Data JPA Query Methods
-- Exception Handling
-- Input Validation
-- Stream API
-- Cart Total Calculation
-- UPSERT Logic
+```bash
+cd SmartCommerce-AI-Backend
+```
 
-## Upcoming Features
+### Configure Database
 
-- Order Management Module
-- Order Item Management
-- Order Status Tracking
-- AI Product Recommendations Using Gemini API
-- AI Product Search
-- Redis Caching
-- Docker Support
-- Product Search and Filtering
-- Pagination and Sorting
-- Inventory Management
-- Deployment
+Update:
 
-## Current Progress
+```properties
+application.properties
+```
 
-| Module | Status |
-|----------|----------|
-| Authentication | Completed |
-| Product Management | Completed |
-| Category Management | Completed |
-| Shopping Cart | Completed |
-| Order Management | In Progress |
-| AI Integration | Planned |
-| Redis Caching | Planned |
-| Dockerization | Planned |
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/smartcommerce
+spring.datasource.username=postgres
+spring.datasource.password=your_password
+```
 
-Project Completion: Approximately 75% Complete
+### Run Application
 
-## Swagger
-<img width="1170" height="904" alt="image" src="https://github.com/user-attachments/assets/076e8a42-de9f-4e85-ad6d-40d157fe67b4" />
+```bash
+mvn spring-boot:run
+```
+
+---
+
+## Future Enhancements
+
+* Docker Compose Deployment
+* Global Exception Handling
+* React Frontend
+* Payment Gateway Integration
+* Email Notifications
+* Kafka Integration
+* Microservices Architecture
+* CI/CD Pipeline
+* Cloud Deployment (AWS)
+
+---
+
+## Learning Outcomes
+
+Through this project, I gained hands-on experience with:
+
+* Spring Boot Development
+* REST API Design
+* JWT Authentication
+* Role-Based Authorization
+* Database Design
+* PostgreSQL
+* Redis Caching
+* Docker
+* Swagger Documentation
+* AI API Integration
+* Git & GitHub Workflows
+* Production-Style Backend Architecture
+
+---
 
 ## Author
 
 **Swapnil Talloo**
 
-GitHub: https://github.com/swapniltalloo/SmartCommerce-AI-Backend
+GitHub: https://github.com/swapniltalloo
+
+---
+
+⭐ If you found this project useful, consider giving it a star!
