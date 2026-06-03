@@ -288,15 +288,7 @@ docker-compose up
 
 ---
 
-## Future Enhancements
 
-* React Frontend
-* Payment Gateway Integration
-* Email Notifications
-* Kubernetes Deployment
-* CI/CD Pipeline
-* Recommendation System
-* Microservices Architecture
 
 ---
 
