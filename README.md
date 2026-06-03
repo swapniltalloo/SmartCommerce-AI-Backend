@@ -1,74 +1,74 @@
 # SmartCommerce AI Backend
 
-A production-style e-commerce backend application built using Java, Spring Boot, PostgreSQL, Redis, JWT Authentication, and Gemini AI integration. The project provides secure REST APIs for product management, cart operations, order processing, admin analytics, and AI-powered product assistance.
-
----
+SmartCommerce is a production-ready Spring Boot E-Commerce Backend that provides secure authentication, product management, cart management, order processing, Redis caching, AI integration, Docker support, and admin analytics.
 
 ## Features
 
 ### Authentication & Authorization
 
-* User Registration and Login
 * JWT-based Authentication
-* BCrypt Password Encryption
+* User Registration & Login
 * Role-Based Access Control (USER / ADMIN)
 * Spring Security Integration
 
 ### Product Management
 
-* Add Product (Admin)
-* Update Product (Admin)
-* Delete Product (Admin)
-* Get All Products
-* Get Product By ID
-* Category-wise Product Organization
-
-### Category Management
-
-* Create Category
-* View Categories
-* Product-Category Relationship Mapping
+* Add Products (Admin)
+* Update Products (Admin)
+* Delete Products (Admin)
+* View Products
+* Product Categories
 
 ### Cart Management
 
-* Add Products to Cart
-* Update Product Quantity
-* Remove Product from Cart
-* View Cart Items
-* Clear Cart
-* Cart Summary with Total Amount
+* Add Items to Cart
+* View Cart
+* Remove Items from Cart
 
 ### Order Management
 
-* Place Order from Cart
-* View User Orders
-* View Order Details
-* Cancel Order
-* Order Status Tracking
-* Automatic Cart Cleanup After Order Placement
+* Place Orders
+* View Order History
+* Order Details
+* Cancel Orders
+* Update Order Status (Admin)
 
 ### Admin Dashboard
 
-* Update Order Status
-* View Revenue Statistics
-* Monitor Order Metrics
+* Total Orders
+* Total Revenue
+* Placed Orders Count
+* Cancelled Orders Count
+* Shipped Orders Count
 
 ### Redis Caching
 
-* Redis Integration using Docker
-* Product API Response Caching
-* Cache Invalidation using @CacheEvict
-* Improved API Performance
+* Product List Caching
+* Cache Eviction on Product Updates
+* Reduced Database Load
+* Faster API Response Time
 
 ### AI Integration
 
-* Gemini API Integration
-* AI-powered Product Search & Recommendations
+* Google Gemini API Integration
+* AI-Powered Product Assistance Endpoint
 
 ### API Documentation
 
-* Swagger/OpenAPI Integration
-* Interactive API Testing
+* Swagger UI Integration
+* OpenAPI 3 Documentation
+
+### Error Handling
+
+* Global Exception Handling
+* Validation Error Handling
+* Resource Not Found Handling
+
+### DevOps
+
+* Docker Support
+* Docker Compose Setup
+* Health Check Endpoint
 
 ---
 
@@ -86,15 +86,11 @@ A production-style e-commerce backend application built using Java, Spring Boot,
 
 * PostgreSQL
 
-### Caching
+### Cache
 
 * Redis
 
-### Authentication
-
-* JWT (JSON Web Tokens)
-
-### API Documentation
+### Documentation
 
 * Swagger / OpenAPI
 
@@ -105,135 +101,32 @@ A production-style e-commerce backend application built using Java, Spring Boot,
 ### DevOps
 
 * Docker
-* Git
-* GitHub
+* Docker Compose
+
+### Build Tool
+
+* Maven
 
 ---
 
-## Project Architecture
+## Project Structure
 
 ```text
-Client
-   ↓
-Spring Security
-   ↓
-Controllers
-   ↓
-Services
-   ↓
-Repositories
-   ↓
-PostgreSQL
-
-           ↓
-         Redis
-        (Cache)
-
-           ↓
-       Gemini AI
+src
+├── controller
+├── service
+├── repository
+├── entity
+├── dto
+├── security
+├── config
+├── exception
+└── resources
 ```
 
 ---
 
-## Database Entities
-
-### User
-
-* id
-* username
-* password
-* role
-
-### Category
-
-* id
-* name
-
-### Product
-
-* id
-* name
-* description
-* price
-* quantity
-* category
-
-### Cart
-
-* id
-* user
-
-### CartItem
-
-* id
-* quantity
-* cart
-* product
-
-### Order
-
-* id
-* totalAmount
-* status
-* user
-
-### OrderItem
-
-* id
-* quantity
-* price
-* order
-* product
-
----
-
-## Security Features
-
-### User Role
-
-Can:
-
-* Browse Products
-* Manage Cart
-* Place Orders
-* View Orders
-* Cancel Orders
-
-### Admin Role
-
-Can:
-
-* Manage Products
-* Manage Categories
-* Update Order Status
-* Access Revenue Dashboard
-
----
-
-## Redis Caching
-
-Implemented caching for frequently accessed product APIs.
-
-```java
-@Cacheable("products")
-public List<Product> getAllProducts()
-```
-
-Cache invalidation:
-
-```java
-@CacheEvict(value = "products", allEntries = true)
-```
-
-Benefits:
-
-* Reduced Database Queries
-* Faster Response Time
-* Better Scalability
-
----
-
-## API Endpoints
+## API Modules
 
 ### Authentication
 
@@ -255,8 +148,10 @@ DELETE /api/products/{id}
 ### Categories
 
 ```http
-POST /api/categories
-GET  /api/categories
+GET    /api/categories
+POST   /api/categories
+PUT    /api/categories/{id}
+DELETE /api/categories/{id}
 ```
 
 ### Cart
@@ -264,64 +159,94 @@ GET  /api/categories
 ```http
 POST   /api/cart/add
 GET    /api/cart
-PUT    /api/cart/update
 DELETE /api/cart/remove/{id}
-DELETE /api/cart/clear
 ```
 
 ### Orders
 
 ```http
-POST /api/orders
-GET  /api/orders
-GET  /api/orders/{id}
-PUT  /api/orders/{id}/cancel
-PUT  /api/orders/{id}/status
+POST   /api/orders
+GET    /api/orders
+GET    /api/orders/{id}
+PUT    /api/orders/{id}/cancel
+PUT    /api/orders/{id}/status
 ```
 
 ### Admin Analytics
 
 ```http
-GET /api/admin/revenue
+GET /api/admin/dashboard
 ```
 
-### AI APIs
+### Gemini AI
 
 ```http
-POST /api/gemini/ask
+GET /api/ai?prompt=your_prompt
+```
+
+### Health Check
+
+```http
+GET /api/health
 ```
 
 ---
 
-## Running the Project
+## Running Locally
 
 ### Clone Repository
 
 ```bash
 git clone https://github.com/swapniltalloo/SmartCommerce-AI-Backend.git
-```
-
-### Navigate
-
-```bash
 cd SmartCommerce-AI-Backend
 ```
 
-### Configure Database
+### Create Configuration
 
-Update:
+Create:
 
-```properties
-application.properties
+```text
+src/main/resources/application.properties
 ```
+
+Copy values from:
+
+```text
+application-example.properties
+```
+
+and replace placeholder values with your own credentials.
+
+---
+
+## PostgreSQL Configuration
 
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/smartcommerce
-spring.datasource.username=postgres
+spring.datasource.username=your_username
 spring.datasource.password=your_password
 ```
 
-### Run Application
+---
+
+## Redis Configuration
+
+```properties
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+```
+
+---
+
+## Gemini Configuration
+
+```properties
+gemini.api.key=your_gemini_api_key
+```
+
+---
+
+## Run Application
 
 ```bash
 mvn spring-boot:run
@@ -329,36 +254,49 @@ mvn spring-boot:run
 
 ---
 
-## Future Enhancements
+## Swagger Documentation
 
-* Docker Compose Deployment
-* Global Exception Handling
-* React Frontend
-* Payment Gateway Integration
-* Email Notifications
-* Kafka Integration
-* Microservices Architecture
-* CI/CD Pipeline
-* Cloud Deployment (AWS)
+```text
+http://localhost:8080/swagger-ui/index.html
+```
 
 ---
 
-## Learning Outcomes
+## Docker
 
-Through this project, I gained hands-on experience with:
+### Build Image
 
-* Spring Boot Development
-* REST API Design
+```bash
+docker build -t smartcommerce .
+```
+
+### Run Application
+
+```bash
+docker-compose up
+```
+
+---
+
+## Security Features
+
 * JWT Authentication
+* Password Encryption using BCrypt
 * Role-Based Authorization
-* Database Design
-* PostgreSQL
-* Redis Caching
-* Docker
-* Swagger Documentation
-* AI API Integration
-* Git & GitHub Workflows
-* Production-Style Backend Architecture
+* Protected Endpoints
+* Secure API Access
+
+---
+
+## Future Enhancements
+
+* React Frontend
+* Payment Gateway Integration
+* Email Notifications
+* Kubernetes Deployment
+* CI/CD Pipeline
+* Recommendation System
+* Microservices Architecture
 
 ---
 
@@ -366,8 +304,13 @@ Through this project, I gained hands-on experience with:
 
 **Swapnil Talloo**
 
-GitHub: https://github.com/swapniltalloo
+B.Tech Electronics & Computer Science Engineering
+
+GitHub:
+https://github.com/swapniltalloo
 
 ---
 
-⭐ If you found this project useful, consider giving it a star!
+## License
+
+This project is built for educational, learning, and portfolio purposes.
