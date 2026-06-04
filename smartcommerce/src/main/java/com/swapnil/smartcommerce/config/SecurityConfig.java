@@ -30,7 +30,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/**",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/api/health"
                         ).permitAll()
 
                         .requestMatchers(
@@ -64,6 +65,11 @@ public class SecurityConfig {
                         ).hasRole("ADMIN")
 
                         .anyRequest().authenticated()
+                )
+
+                .addFilterBefore(
+                        jwtAuthFilter,
+                        UsernamePasswordAuthenticationFilter.class
                 );
 
         return http.build();
