@@ -17,7 +17,7 @@ public class ProductService {
     private ProductRepository productRepository;
     @Autowired
     private CategoryRepository categoryRepository;
-    @CacheEvict(value = "products", allEntries = true)
+  //  @CacheEvict(value = "products", allEntries = true)
     public Product addProduct(ProductDTO productDTO) {
 
         Category category = categoryRepository.findById(
@@ -40,7 +40,7 @@ public class ProductService {
 
         return productRepository.save(product);
     }
-    @Cacheable("products")
+    //@Cacheable("products")
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
@@ -50,7 +50,7 @@ public class ProductService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product not found with id: " + id));
     }
-    @CacheEvict(value = "products", allEntries = true)
+    //@CacheEvict(value = "products", allEntries = true)
     public Product updateProduct(Long id, Product updatedProduct) {
 
         Product existingProduct = productRepository.findById(id).orElse(null);
@@ -66,7 +66,7 @@ public class ProductService {
         }
 
         return null;
-    }@CacheEvict(value = "products", allEntries = true)
+    }//@CacheEvict(value = "products", allEntries = true)
     public String deleteProduct(Long id) {
 
         Product product = productRepository.findById(id)
