@@ -18,4 +18,13 @@ public class GeminiController {
 
         return geminiService.askGemini(prompt);
     }
+
+    @GetMapping("/recommend/{userId}")
+    public String recommendProducts(
+            @PathVariable Long userId
+    ) {
+
+        return geminiService
+                .recommendProducts(userId);
+    }
 }
