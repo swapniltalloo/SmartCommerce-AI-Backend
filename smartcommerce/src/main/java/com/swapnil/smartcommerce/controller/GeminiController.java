@@ -19,12 +19,9 @@ public class GeminiController {
         return geminiService.askGemini(prompt);
     }
 
-    @GetMapping("/recommend/{userId}")
-    public String recommendProducts(
-            @PathVariable Long userId
-    ) {
+    @GetMapping("/recommend")
+    public String recommendProducts() {
 
-        return geminiService
-                .recommendProducts(userId);
+        return geminiService.recommendProducts();
     }
 }

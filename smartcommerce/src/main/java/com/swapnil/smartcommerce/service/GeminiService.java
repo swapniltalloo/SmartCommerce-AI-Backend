@@ -1,40 +1,62 @@
 package com.swapnil.smartcommerce.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import okhttp3.*;
-import java.io.IOException;
-import com.swapnil.smartcommerce.entity.User;
 import com.swapnil.smartcommerce.entity.Order;
 import com.swapnil.smartcommerce.entity.OrderItem;
-import com.swapnil.smartcommerce.repository.UserRepository;
+import com.swapnil.smartcommerce.entity.User;
 import com.swapnil.smartcommerce.repository.OrderRepository;
+import com.swapnil.smartcommerce.repository.UserRepository;
+import okhttp3.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
+
 @Service
 public class GeminiService {
+
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private OrderRepository orderRepository;
+
     @Value("${gemini.api.key}")
     private String apiKey;
-    public String recommendProducts(Long userId) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+    public String recommendProducts() {
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        String username =
+                authentication.getName();
+
+        User user =
+                userRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"
+                                )
+                        );
 
         List<Order> orders =
                 orderRepository.findByUser(user);
 
         if (orders.isEmpty()) {
-            return "No order history found.";
+
+            return """
+                    No order history found.
+                    Place some orders first.
+                    """;
         }
 
-        StringBuilder purchaseHistory =
+        StringBuilder history =
                 new StringBuilder();
 
         for (Order order : orders) {
@@ -42,24 +64,27 @@ public class GeminiService {
             for (OrderItem item :
                     order.getOrderItems()) {
 
-                purchaseHistory.append(
-                        item.getProduct().getName()
+                history.append(
+                        item.getProduct()
+                                .getName()
                 ).append(", ");
             }
         }
 
         String prompt = """
-            User has purchased:
+                User purchased:
 
-            %s
+                %s
 
-            Recommend 5 products
-            with reasons.
-            """
-                .formatted(purchaseHistory);
+                Recommend 5 products with reasons.
+
+                Keep the response concise.
+                """
+                .formatted(history);
 
         return askGemini(prompt);
     }
+
     public String askGemini(String prompt) {
 
         OkHttpClient client =
