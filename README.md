@@ -296,7 +296,7 @@ docker-compose up
 
 **Swapnil Talloo**
 
-B.Tech Electronics & Computer Science Engineering
+
 
 GitHub:
 https://github.com/swapniltalloo
