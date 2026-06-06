@@ -56,7 +56,7 @@ SmartCommerce is a production-ready Spring Boot E-Commerce Backend that provides
 ### API Documentation
 
 * Swagger UI Integration
-* OpenAPI 3 Documentation
+  
 
 ### Error Handling
 
