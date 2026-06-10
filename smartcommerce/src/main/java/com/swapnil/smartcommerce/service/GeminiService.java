@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,6 +28,7 @@ public class GeminiService {
     @Value("${gemini.api.key}")
     private String apiKey;
 
+    @Transactional
     public String recommendProducts() {
 
         Authentication authentication =
@@ -56,7 +58,7 @@ public class GeminiService {
                     """;
         }
 
-        StringBuilder history =
+        StringBuilder purchaseHistory =
                 new StringBuilder();
 
         for (Order order : orders) {
@@ -64,45 +66,54 @@ public class GeminiService {
             for (OrderItem item :
                     order.getOrderItems()) {
 
-                history.append(
-                        item.getProduct()
-                                .getName()
-                ).append(", ");
+                purchaseHistory
+                        .append(item.getProduct().getName())
+                        .append(", ");
             }
         }
 
         String prompt = """
-                User purchased:
+                User purchased the following products:
 
                 %s
 
-                Recommend 5 products with reasons.
+                Recommend 5 similar products.
+                
+                For each recommendation provide:
+                - Product Name
+                - Short Reason
 
                 Keep the response concise.
                 """
-                .formatted(history);
+                .formatted(purchaseHistory);
 
         return askGemini(prompt);
     }
 
     public String askGemini(String prompt) {
 
+        System.out.println("================================");
+        System.out.println("Gemini Key Loaded: "
+                + (apiKey != null && !apiKey.isEmpty()));
+        System.out.println("================================");
+
         OkHttpClient client =
                 new OkHttpClient();
 
         String jsonBody = """
-        {
-          "contents": [
-            {
-              "parts": [
                 {
-                  "text": "%s"
+                  "contents": [
+                    {
+                      "parts": [
+                        {
+                          "text": "%s"
+                        }
+                      ]
+                    }
+                  ]
                 }
-              ]
-            }
-          ]
-        }
-        """.formatted(prompt);
+                """
+                .formatted(prompt.replace("\"", "\\\""));
 
         RequestBody body =
                 RequestBody.create(
@@ -127,12 +138,29 @@ public class GeminiService {
                     client.newCall(request)
                             .execute();
 
-            return response.body()
-                    .string();
+            String responseBody =
+                    response.body() != null
+                            ? response.body().string()
+                            : "No response body";
+
+            System.out.println(
+                    "Gemini Status Code: "
+                            + response.code()
+            );
+
+            System.out.println(
+                    "Gemini Response: "
+                            + responseBody
+            );
+
+            return responseBody;
 
         } catch (IOException e) {
 
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                    "Failed to call Gemini API",
+                    e
+            );
         }
     }
 }

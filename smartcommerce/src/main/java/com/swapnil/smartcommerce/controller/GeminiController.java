@@ -22,6 +22,6 @@ public class GeminiController {
     @GetMapping("/recommend")
     public String recommendProducts() {
 
-        return geminiService.recommendProducts();
+           return geminiService.recommendProducts();
     }
 }
