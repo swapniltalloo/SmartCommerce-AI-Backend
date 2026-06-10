@@ -1,294 +1,321 @@
-# SmartCommerce AI Backend
+# SmartCommerce AI
 
-SmartCommerce is a production-ready Spring Boot E-Commerce Backend that provides secure authentication, product management, cart management, order processing, Redis caching, AI integration, Docker support, and admin analytics.
+A production-ready AI-powered e-commerce backend built using Spring Boot, PostgreSQL, Redis, JWT Authentication, and Google Gemini AI.
 
-## Features
+## Overview
 
-### Authentication & Authorization
+SmartCommerce AI is a scalable backend platform that simulates a real-world e-commerce ecosystem. The system provides secure authentication, role-based access control, product and inventory management, shopping cart functionality, order processing, analytics, caching, and AI-powered product recommendations.
 
-* JWT-based Authentication
-* User Registration & Login
-* Role-Based Access Control (USER / ADMIN)
-* Spring Security Integration
-
-### Product Management
-
-* Add Products (Admin)
-* Update Products (Admin)
-* Delete Products (Admin)
-* View Products
-* Product Categories
-
-### Cart Management
-
-* Add Items to Cart
-* View Cart
-* Remove Items from Cart
-
-### Order Management
-
-* Place Orders
-* View Order History
-* Order Details
-* Cancel Orders
-* Update Order Status (Admin)
-
-### Admin Dashboard
-
-* Total Orders
-* Total Revenue
-* Placed Orders Count
-* Cancelled Orders Count
-* Shipped Orders Count
-
-### Redis Caching
-
-* Product List Caching
-* Cache Eviction on Product Updates
-* Reduced Database Load
-* Faster API Response Time
-
-### AI Integration
-
-* Google Gemini API Integration
-* AI-Powered Product Assistance Endpoint
-
-### API Documentation
-
-* Swagger UI Integration
-  
-
-### Error Handling
-
-* Global Exception Handling
-* Validation Error Handling
-* Resource Not Found Handling
-
-### DevOps
-
-* Docker Support
-* Docker Compose Setup
-* Health Check Endpoint
+The project was designed with modern backend engineering principles including layered architecture, RESTful APIs, security best practices, caching strategies, containerization, and cloud deployment.
 
 ---
 
-## Tech Stack
+## Key Features
+
+### Authentication & Security
+
+* JWT-based authentication and authorization
+* Secure password hashing using BCrypt
+* Role-Based Access Control (RBAC)
+* Admin and User access separation
+* Protected API endpoints using Spring Security
+
+### Product Management
+
+* Create, update, delete, and retrieve products
+* Product categorization
+* Inventory management
+* Input validation using Jakarta Validation
+
+### Category Management
+
+* Category CRUD operations
+* Product-category relationship management
+
+### Shopping Cart
+
+* Add products to cart
+* Update quantities
+* Remove products from cart
+* View active cart items
+
+### Order Management
+
+* Place orders from cart
+* Order history tracking
+* Order status updates
+* Order cancellation support
+
+### Administrative Features
+
+* Manage products and categories
+* View all orders across the platform
+* Update order statuses
+* Revenue analytics dashboard APIs
+
+### Caching
+
+* Redis integration for high-frequency product queries
+* Reduced database load
+* Improved response times
+
+### Artificial Intelligence
+
+* Integration with Google Gemini API
+* AI-powered product recommendation engine
+* Personalized recommendations based on user purchase history
+
+### API Documentation
+
+* Interactive Swagger/OpenAPI documentation
+* Endpoint testing directly from browser
+
+---
+
+## System Architecture
+
+```text
+Client Applications
+        │
+        ▼
+Spring Boot REST APIs
+        │
+ ┌──────┼─────────┐
+ │      │         │
+ ▼      ▼         ▼
+Security  Redis   Gemini AI
+(JWT)    Cache    Service
+ │
+ ▼
+PostgreSQL Database
+```
+
+---
+
+## Technology Stack
 
 ### Backend
 
-* Java 17
+* Java 21
 * Spring Boot 3
 * Spring Security
 * Spring Data JPA
 * Hibernate
+* Maven
 
 ### Database
 
 * PostgreSQL
 
-### Cache
+### Caching
 
 * Redis
+
+### AI Integration
+
+* Google Gemini API
 
 ### Documentation
 
 * Swagger / OpenAPI
 
-### AI
-
-* Google Gemini API
-
-### DevOps
+### Deployment & DevOps
 
 * Docker
-* Docker Compose
-
-### Build Tool
-
-* Maven
+* Render Cloud Platform
+* Git & GitHub
 
 ---
 
 ## Project Structure
 
 ```text
-src
-├── controller
-├── service
-├── repository
-├── entity
-├── dto
-├── security
+src/main/java/com/swapnil/smartcommerce
+
 ├── config
+├── controller
+├── dto
+├── entity
 ├── exception
-└── resources
+├── repository
+├── security
+├── service
+└── SmartcommerceApplication
 ```
+
+The project follows a layered architecture:
+
+* Controller Layer
+* Service Layer
+* Repository Layer
+* Persistence Layer
+
+This separation improves maintainability, scalability, and testability.
 
 ---
 
-## API Modules
+## Security Architecture
 
-### Authentication
-
-```http
-POST /auth/register
-POST /auth/login
-```
-
-### Products
-
-```http
-GET    /api/products
-GET    /api/products/{id}
-POST   /api/products
-PUT    /api/products/{id}
-DELETE /api/products/{id}
-```
-
-### Categories
-
-```http
-GET    /api/categories
-POST   /api/categories
-PUT    /api/categories/{id}
-DELETE /api/categories/{id}
-```
-
-### Cart
-
-```http
-POST   /api/cart/add
-GET    /api/cart
-DELETE /api/cart/remove/{id}
-```
-
-### Orders
-
-```http
-POST   /api/orders
-GET    /api/orders
-GET    /api/orders/{id}
-PUT    /api/orders/{id}/cancel
-PUT    /api/orders/{id}/status
-```
-
-### Admin Analytics
-
-```http
-GET /api/admin/dashboard
-```
-
-### Gemini AI
-
-```http
-GET /api/ai?prompt=your_prompt
-```
-
-### Health Check
-
-```http
-GET /api/health
-```
-
----
-
-## Running Locally
-
-### Clone Repository
-
-```bash
-git clone https://github.com/swapniltalloo/SmartCommerce-AI-Backend.git
-cd SmartCommerce-AI-Backend
-```
-
-### Create Configuration
-
-Create:
+Authentication Flow:
 
 ```text
-src/main/resources/application.properties
+User Login
+    │
+    ▼
+JWT Generation
+    │
+    ▼
+Client Stores Token
+    │
+    ▼
+JWT Sent With Requests
+    │
+    ▼
+JwtAuthFilter Validation
+    │
+    ▼
+Access Granted / Denied
 ```
 
-Copy values from:
+Roles:
+
+### USER
+
+* Browse products
+* Manage cart
+* Place orders
+* View order history
+* Access AI recommendations
+
+### ADMIN
+
+* Manage products
+* Manage categories
+* Manage orders
+* Update order statuses
+* Access analytics endpoints
+
+---
+
+## AI Recommendation Engine
+
+The recommendation engine analyzes a user's historical purchases and leverages Google Gemini to generate personalized product suggestions.
+
+Workflow:
 
 ```text
-application-example.properties
+User Orders
+      │
+      ▼
+Purchase History
+      │
+      ▼
+Gemini Prompt Generation
+      │
+      ▼
+AI Recommendation Engine
+      │
+      ▼
+Personalized Suggestions
 ```
 
-and replace placeholder values with your own credentials.
+This feature demonstrates the integration of Generative AI within a traditional enterprise backend system.
 
 ---
 
-## PostgreSQL Configuration
+## API Documentation
 
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/smartcommerce
-spring.datasource.username=your_username
-spring.datasource.password=your_password
-```
-
----
-
-## Redis Configuration
-
-```properties
-spring.data.redis.host=localhost
-spring.data.redis.port=6379
-```
-
----
-
-## Gemini Configuration
-
-```properties
-gemini.api.key=your_gemini_api_key
-```
-
----
-
-## Run Application
-
-```bash
-mvn spring-boot:run
-```
-
----
-
-## Swagger Documentation
+Swagger UI:
 
 ```text
 http://localhost:8080/swagger-ui/index.html
 ```
 
----
+Production Deployment:
 
-## Docker
-
-### Build Image
-
-```bash
-docker build -t smartcommerce .
-```
-
-### Run Application
-
-```bash
-docker-compose up
+```text
+https://smartcommerce-ai-backend.onrender.com/swagger-ui/index.html
 ```
 
 ---
 
-## Security Features
+## Environment Variables
 
-* JWT Authentication
-* Password Encryption using BCrypt
-* Role-Based Authorization
-* Protected Endpoints
-* Secure API Access
+```env
+PGHOST=
+PGPORT=
+PGDATABASE=
+PGUSER=
+PGPASSWORD=
+
+REDIS_HOST=
+REDIS_PORT=
+
+GEMINI_API_KEY=
+```
 
 ---
 
+## Docker Support
 
+Build Image:
+
+```bash
+docker build -t smartcommerce-ai .
+```
+
+Run Container:
+
+```bash
+docker run -p 8080:8080 smartcommerce-ai
+```
+
+---
+
+## Deployment
+
+### Backend
+
+Deployed on Render Cloud Platform.
+
+### Database
+
+PostgreSQL hosted in the cloud.
+
+### Cache Layer
+
+Redis integration for optimized API performance.
+
+---
+
+## Future Enhancements
+
+* React Frontend
+* Payment Gateway Integration
+* Elasticsearch-Based Product Search
+* Event-Driven Architecture with Kafka
+* CI/CD Pipeline using GitHub Actions
+* Kubernetes Deployment
+* Comprehensive Unit & Integration Testing
+* Microservices Migration
+
+---
+
+## Learning Outcomes
+
+Through this project, the following concepts were implemented and explored:
+
+* Spring Boot Application Development
+* REST API Design
+* JWT Authentication & Authorization
+* Spring Security
+* ORM with Hibernate/JPA
+* PostgreSQL Database Design
+* Redis Caching
+* Cloud Deployment
+* Docker Containerization
+* AI Integration using Gemini API
+* Enterprise Backend Architecture
 
 ---
 
@@ -296,13 +323,10 @@ docker-compose up
 
 **Swapnil Talloo**
 
+B.Tech Student | Backend Developer | AI Enthusiast
 
-
-GitHub:
-https://github.com/swapniltalloo
+GitHub: https://github.com/swapniltalloo
 
 ---
 
-## License
-
-This project is built for educational, learning, and portfolio purposes.
+If you found this project valuable, consider giving it a star.
