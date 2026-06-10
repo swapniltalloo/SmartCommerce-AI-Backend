@@ -18,4 +18,10 @@ public class GeminiController {
 
         return geminiService.askGemini(prompt);
     }
+
+    @GetMapping("/recommend")
+    public String recommendProducts() {
+
+           return geminiService.recommendProducts();
+    }
 }
